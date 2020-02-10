@@ -49,8 +49,8 @@
 				o.rayOrigin = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos, 1));
 				o.hitPosition = v.vertex;
 
-				//o.rayOrigin = _WorldSpaceCameraPos;
-				//o.hitPosition = mul(unity_ObjectToWorld, v.vertex);
+				o.rayOrigin = _WorldSpaceCameraPos;
+				o.hitPosition = mul(unity_ObjectToWorld, v.vertex);
 
 				return o;
 			}
@@ -69,7 +69,7 @@
 
 			float Mandelbulb(float3 position)
 			{
-				int iterations = 10;
+				int iterations = 5;
 				float bailout = 1.15;
 				float power = 5;
 
@@ -104,7 +104,7 @@
 			}
 
 			float2 DE(float3 pos) {
-				float Power = 3.0 + 4.0*(sin(1 / 30.0) + 1.0);
+				float Power = 3.0 + 4.0*(sin(_Time / 10.0) + 1.0);
 				float3 z = pos;
 				float dr = 1.0;
 				float r = 0.0;
@@ -135,8 +135,8 @@
 
 			float GetDistance(float3 position)
 			{
-				//float3 distance = DE(position).x;
-				float3 distance = Torus(position);
+				float3 distance = DE(position).x;
+				//float3 distance = Sphere(position);
 				return distance;
 			}
 
@@ -171,8 +171,10 @@
 			{
 				float SURF_DIST = 2;
 
-				float3 lightPos = mul(unity_WorldToObject, float3(0, 5, 6));
-				float3 l = normalize(lightPos - p);
+				float3 lightPos = float3(0, 5, 6);
+				lightPos.x += _SinTime * 5;
+				lightPos.z += _CosTime * 10.0;
+				float3 l = mul(unity_WorldToObject, normalize(lightPos - p));
 				float3 n = GetNormal(p);
 
 				float dif = clamp(dot(n, l), 0., 1.);
